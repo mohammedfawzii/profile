@@ -1,8 +1,12 @@
 <?php
+
 namespace App\Http\Controllers;
 
+use App\Http\Requests\ProfileRequest;
 use App\Models\Profile;
+
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class ProfileController extends Controller
 {
@@ -12,26 +16,20 @@ class ProfileController extends Controller
         return view('profile', compact('profile'));
     }
 
-    public function update(Request $request, $id)
+    public function update(ProfileRequest $request, $id)
     {
         $profile = Profile::findOrFail($id);
-
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|max:255|unique:profiles,email,' . $profile->id,
-            'bio' => 'nullable|string|max:500',
-            'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
-        ]);
-
-        $data = $request->only('name', 'email', 'bio');
-
+        $profile->update($request->only(['name', 'email', 'bio', 'address', 'phone_number', 'gender', 'birthdate']));
         if ($request->hasFile('avatar')) {
-            $avatarPath = $request->file('avatar')->store('avatars', 'public');
-            $data['avatar'] = $avatarPath;
+            if ($profile->avatar) {
+                Storage::disk('public')->delete($profile->avatar);
+            }
+            $path = $request->file('avatar')->store('avatars', 'public');
+            $profile->update(['avatar' => $path]);
         }
-
-        $profile->update($data);
-
-        return response()->json(['message' => 'Profile updated successfully']);
+        return response()->json([
+            'message' => 'Profile updated successfully',
+            'avatar_url' => asset('storage/' . $path),
+        ]);
     }
 }

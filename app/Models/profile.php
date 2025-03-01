@@ -3,13 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Spatie\MediaLibrary\HasMedia;
-use Spatie\MediaLibrary\InteractsWithMedia;
+
 use Illuminate\Database\Eloquent\Model;
 
-class Profile extends Model implements HasMedia
+class Profile extends Model
 {
-    use InteractsWithMedia,HasFactory;
+    use HasFactory;
 
     protected $fillable = [
         'name',
@@ -19,5 +18,6 @@ class Profile extends Model implements HasMedia
         'phone_number',
         'gender',
         'birthdate',
+        'avatar'
     ];
 }

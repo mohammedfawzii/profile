@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('phone_number')->unique();
             $table->enum('gender',['male','female'])->default('male');
             $table->date('birthdate');
+            $table->string('avatar')->nullable();
             $table->timestamps();
         });
     }

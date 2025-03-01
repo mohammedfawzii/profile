@@ -20,16 +20,23 @@ class ProfileController extends Controller
     {
         $profile = Profile::findOrFail($id);
         $profile->update($request->only(['name', 'email', 'bio', 'address', 'phone_number', 'gender', 'birthdate']));
+
+        $avatarUrl = $profile->avatar ? asset('storage/' . $profile->avatar) : null;
+
         if ($request->hasFile('avatar')) {
             if ($profile->avatar) {
                 Storage::disk('public')->delete($profile->avatar);
             }
             $path = $request->file('avatar')->store('avatars', 'public');
             $profile->update(['avatar' => $path]);
+
+            $avatarUrl = asset('storage/' . $path);
         }
+
         return response()->json([
             'message' => 'Profile updated successfully',
-            'avatar_url' => asset('storage/' . $path),
+            'avatar_url' => $avatarUrl,
         ]);
     }
+
 }
